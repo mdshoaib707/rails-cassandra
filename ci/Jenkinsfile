@@ -1,12 +1,16 @@
 properties([
     parameters([
-        string(name: 'TARGET_NAMESPACE', defaultValue: 'qa1', description: 'the namespace of the target site service', trim: true),
+        string(name: 'TARGET_NAMESPACE', defaultValue: 'rails', description: 'the namespace of the target site service', trim: true),
     ]) //parameters
 ]) //properties
 
 @Library('jenkins-lib@master')_
 pipeline {
     agent any
+
+    environment {
+        PROJECT_NAME = "railsapp"
+    }
 
     stages {
         stage('Build Image') {
@@ -50,23 +54,25 @@ pipeline {
             }
 
             steps {
-                env.REPLICA = env.REPLICA ?: "1"
-                def helmName = "${PROJECT_NAME}-${env.TARGET_NAMESPACE}"
+                script {
+                    env.REPLICA = env.REPLICA ?: "1"
+                    def helmName = "${PROJECT_NAME}-${env.TARGET_NAMESPACE}"
 
-                def overrides = ["img.tag=${env.IMG_TAG}",
-                                "image.pullPolicy=Always",
-                                "replicaCount=${env.REPLICA}"
-                                ]
-                
-                helm.upgrade(
-                    chart: 'ci/railsapp',
-                    name: helmName,
-                    namespace: env.TARGET_NAMESPACE,
-                    set: overrides,
-                    force: true,
-                    debug: true,
-                    wait: true
-                ) // End of helm upgrade
+                    def overrides = ["img.tag=${env.IMG_TAG}",
+                                    "image.pullPolicy=Always",
+                                    "replicaCount=${env.REPLICA}"
+                                    ]
+                    
+                    helm.upgrade(
+                        chart: 'ci/railsapp',
+                        name: helmName,
+                        namespace: env.TARGET_NAMESPACE,
+                        set: overrides,
+                        force: true,
+                        debug: true,
+                        wait: true
+                    ) // End of helm upgrade
+                }              
             }
         } // End of Deploy
     }
