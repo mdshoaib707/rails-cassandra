@@ -67,7 +67,7 @@ pipeline {
                         chart: 'ci/railsapp',
                         name: helmName,
                         namespace: env.TARGET_NAMESPACE,
-                        context: minikube,
+                        context: 'minikube',
                         set: overrides,
                         force: true,
                         debug: true,
