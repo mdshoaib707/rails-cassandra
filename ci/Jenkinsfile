@@ -1,0 +1,81 @@
+properties([
+    parameters([
+        string(name: 'TARGET_NAMESPACE', defaultValue: 'rails', description: 'the namespace of the target site service', trim: true),
+    ]) //parameters
+]) //properties
+
+@Library('jenkins-lib@master')_
+pipeline {
+    agent any
+
+    environment {
+        PROJECT_NAME = "railsapp"
+    }
+
+    stages {
+        stage('Build Image') {
+            when {
+                anyOf {
+                    // master branch
+                    branch 'master'
+                    // there is a PR
+                    expression {
+                        return env.CHANGE_ID && env.CHANGE_ID == 'master'
+                    }
+                }
+            }
+
+            steps {
+                script {
+                    def timestamp = new Date().format('yyyyMMdd-HHmmss-SSS')
+                    def defaultTagName = env.BRANCH_NAME ? timestamp : env.BRANCH_NAME
+
+                    env.IMG_TAG = env.IMG_TAG ?: defaultTagName
+
+                    sh """
+                    docker login -u mdshoaib707 -p Oracle@123
+                    docker build -f Dockerfile -t mdshoaib707/rails-cassandra:${IMG_TAG} .
+                    docker push mdshoaib707/rails-cassandra:${IMG_TAG}
+                    """
+                }
+            }
+        }
+
+        stage('Deploy') {
+            when {
+                anyOf {
+                    // master branch
+                    branch 'master'
+                    // there is a PR
+                    expression {
+                        return env.CHANGE_ID && env.CHANGE_ID == 'master'
+                    }
+                }
+            }
+
+            steps {
+                script {
+                    env.REPLICA = env.REPLICA ?: "1"
+                    def helmName = "${PROJECT_NAME}-${env.TARGET_NAMESPACE}"
+
+                    def overrides = ["img.tag=${env.IMG_TAG}",
+                                    "image.pullPolicy=Always",
+                                    "replicaCount=${env.REPLICA}"
+                                    ]
+                    
+                    helm.upgrade(
+                        chart: 'ci/railsapp',
+                        name: helmName,
+                        namespace: env.TARGET_NAMESPACE,
+                        context: minikube,
+                        set: overrides,
+                        force: true,
+                        debug: true,
+                        wait: true
+                    ) // End of helm upgrade
+                }              
+            }
+        } // End of Deploy
+    }
+}
+

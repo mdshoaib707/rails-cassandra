@@ -1,0 +1,29 @@
+FROM ubuntu:18.04
+
+RUN apt-get update && \
+        apt-get install wget curl tar -y
+# Install JAVA
+ENV JDK_VERSION=openjdk-13.0.1_linux-x64_bin.tar.gz
+RUN cd /root/ && \
+    wget https://download.java.net/java/GA/jdk13.0.1/cec27d702aa74d5a8630c65ae61e4305/9/GPL/${JDK_VERSION} && \
+    tar zxf ${JDK_VERSION} && \
+    rm -rf ${JDK_VERSION}
+
+ENV JAVA_HOME /root/jdk-13.0.1/
+ENV PATH=$PATH:$JAVA_HOME/bin/
+
+# Install Nodejs
+RUN curl -sL https://deb.nodesource.com/setup_12.x | bash -E - && \
+    apt-get install -y nodejs
+
+# Install Yarn
+RUN curl -sS https://dl.yarnpkg.com/debian/pubkey.gpg | apt-key add - && \
+    echo "deb https://dl.yarnpkg.com/debian/ stable main" | tee /etc/apt/sources.list.d/yarn.list && \
+    apt update && apt install --no-install-recommends yarn
+
+# Install rails
+RUN gpg --keyserver hkp://keys.gnupg.net --recv-keys 409B6B1796C275462A1703113804BB82D39DC0E3 7D2BAF1CF37B13E2069D6956105BD0E739499BDB && \
+        curl -sSL https://get.rvm.io | bash -s stable --ruby
+
+RUN /bin/bash -c "source /usr/local/rvm/scripts/rvm && /usr/local/rvm/bin/rvm install ruby-2.7.1 && /usr/local/rvm/rubies/ruby-2.7.1/bin/gem install rails -v 6.0.3.1"
+
