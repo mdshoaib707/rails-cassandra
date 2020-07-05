@@ -64,7 +64,8 @@ pipeline {
 
                     def overrides = ["image.tag=${env.IMG_TAG}",
                                     "image.pullPolicy=Always",
-                                    "replicaCount=${env.REPLICA}"
+                                    "replicaCount=${env.REPLICA}",
+                                     "service.type=NodePort"
                                     ]
                     
                     helm.upgrade(
@@ -73,7 +74,6 @@ pipeline {
                         namespace: env.TARGET_NAMESPACE,
                         context: 'minikube',
                         set: overrides,
-                        force: true,
                         debug: true,
                         wait: true
                     ) // End of helm upgrade
