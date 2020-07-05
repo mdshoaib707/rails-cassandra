@@ -62,7 +62,7 @@ pipeline {
                     env.REPLICA = env.REPLICA ?: "1"
                     def helmName = "${PROJECT_NAME}-${env.TARGET_NAMESPACE}"
 
-                    def overrides = ["img.tag=${env.IMG_TAG}",
+                    def overrides = ["image.tag=${env.IMG_TAG}",
                                     "image.pullPolicy=Always",
                                     "replicaCount=${env.REPLICA}"
                                     ]
