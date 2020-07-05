@@ -31,12 +31,16 @@ pipeline {
                     def defaultTagName = env.BRANCH_NAME ? timestamp : env.BRANCH_NAME
 
                     env.IMG_TAG = env.IMG_TAG ?: defaultTagName
+                    
+                    withCredentials([usernamePassword(credentialsId: 'docker-creds', passwordVariable: 'dck_passwd', usernameVariable: 'dck_user')]) {
+                        sh """
+                        docker login -u ${dck_user} -p ${dck_passwd}
+                        docker build -f Dockerfile -t mdshoaib707/rails-cassandra:${IMG_TAG} .
+                        docker push mdshoaib707/rails-cassandra:${IMG_TAG}
+                        """
+                    }
 
-                    sh """
-                    docker login -u mdshoaib707 -p Oracle@123
-                    docker build -f Dockerfile -t mdshoaib707/rails-cassandra:${IMG_TAG} .
-                    docker push mdshoaib707/rails-cassandra:${IMG_TAG}
-                    """
+                    
                 }
             }
         }
