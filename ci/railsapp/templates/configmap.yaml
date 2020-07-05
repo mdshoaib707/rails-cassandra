@@ -5,38 +5,38 @@ metadata:
 data:
   cequel.yml: |
     development:
-        host: 'cassandra.db.svc.cluster.local'
-        port: 9042
-        keyspace: blog_development
-        max_retries: 3
-        retry_delay: 0.5
-        username: 'cassandra'
-        password: 'CDqj9sEnIR'
-        newrelic: false
+      host: 'cassandra.db.svc.cluster.local'
+      port: 9042
+      keyspace: blog_development
+      max_retries: 3
+      retry_delay: 0.5
+      username: 'cassandra'
+      password: 'CDqj9sEnIR'
+      newrelic: false
 
     test:
-        host: 'cassandra.db.svc.cluster.local'
-        port: 9042
-        keyspace: blog_test
-        username: 'cassandra'
-        password: 'CDqj9sEnIR'
-        max_retries: 3
-        retry_delay: 0.5
-        newrelic: false
+      host: 'cassandra.db.svc.cluster.local'
+      port: 9042
+      keyspace: blog_test
+      username: 'cassandra'
+      password: 'CDqj9sEnIR'
+      max_retries: 3
+      retry_delay: 0.5
+      newrelic: false
 
     production:
-        hosts:
-            - 'cassandra.db.svc.cluster.local'
-        port: 9042
-        keyspace: blog_production
-        username: 'cassandra'
-        password: 'CDqj9sEnIR'
-        max_retries: 3
-        retry_delay: 0.5
-        newrelic: true
-        replication:
-            class: SimpleStrategy
-            replication_factor: 1
+      hosts:
+        - 'cassandra.db.svc.cluster.local'
+      port: 9042
+      keyspace: blog_production
+      username: 'cassandra'
+      password: 'CDqj9sEnIR'
+      max_retries: 3
+      retry_delay: 0.5
+      newrelic: true
+      replication:
+        class: SimpleStrategy
+        replication_factor: 1
         # replication:
         #   class: NetworkTopologyStrategy
         #   datacenter1: 3
